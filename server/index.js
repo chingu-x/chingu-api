@@ -37,6 +37,8 @@ async function startServer() {
     typeDefs,
     resolvers,
     schemaDirectives,
+    introspection: true,
+    playground: true,
     dataSources: initializeDataSources,
     context: async ({ req }) => ({
       token: req.headers.authorization,
