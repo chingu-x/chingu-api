@@ -49,7 +49,7 @@ async function startServer() {
         "BAD_USER_INPUT",
         "INTERNAL_SERVER_ERROR",
       ];
-      if (!userErrors.includes(err.code)) {
+      if (!err.extensions || !userErrors.includes(err.extensions.code)) {
         logger.error(err);
 
         // Mask errors in production
