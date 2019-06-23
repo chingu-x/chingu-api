@@ -1,0 +1,74 @@
+{
+  "name": "chingu-api",
+  "version": "1.0.0",
+  "description": "Central Chingu API",
+  "main": "server/index.js",
+  "license": "MIT",
+  "private": true,
+  "engines": {
+    "node": "10.x.x"
+  },
+  "scripts": {
+    "start": "node server",
+    "dev": "nodemon server"
+  },
+  "dependencies": {
+    "apollo-server-express": "^2.6.3",
+    "bcrypt": "^3.0.6",
+    "cors": "^2.8.5",
+    "dataloader": "^1.4.0",
+    "express": "^4.17.1",
+    "graphql": "^14.2.1",
+    "http": "^0.0.0",
+    "https": "^1.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "morgan": "^1.9.1",
+    "pg": "^7.11.0",
+    "sequelize": "^5.8.10",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "eslint-config-google": "^0.13.0",
+    "eslint-config-prettier": "^5.0.0",
+    "husky": "^2.4.1",
+    "lint-staged": "^8.2.1",
+    "nodemon": "^1.19.1",
+    "prettier": "^1.18.2"
+  },
+  "prettier": {
+    "trailingComma": "all",
+    "semi": true
+  },
+  "eslintConfig": {
+    "extends": [
+      "google",
+      "prettier"
+    ],
+    "parserOptions": {
+      "ecmaVersion": 2019
+    },
+    "env": {
+      "node": true
+    },
+    "rules": {
+      "no-console": 1,
+      "no-unused-vars": 1,
+      "require-jsdoc": 1
+    }
+  },
+  "eslintIgnore": [
+    "node_modules"
+  ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,json,md,graphql}": [
+      "prettier --write",
+      "git add"
+    ]
+  }
+}
