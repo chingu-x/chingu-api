@@ -8,7 +8,7 @@ const {
 const {
   TOKEN_AUDIENCE,
   TOKEN_ISSUER,
-  getPublicKey,
+  SECRET_KEY,
 } = require("../utilities/auth");
 
 /**
@@ -33,56 +33,6 @@ class AuthDirective extends SchemaDirectiveVisitor {
   visitFieldDefinition(field, details) {
     this.ensureFieldsWrapped(details.objectType);
     field._requiredAuthRole = this.args.requires;
-  }
-
-  /**
-   * Verifies user access tokens
-   * @param {string} token - The token to verify
-   * @return {Promise} Resolves to a decoded token
-   */
-  async verifyToken(token) {
-    if (!token) {
-      throw new AuthenticationError("Authentication required.");
-    }
-
-    let decodedToken;
-    try {
-      decodedToken = await getPublicKey().then(publicKey => {
-        return new Promise((resolve, reject) => {
-          jwt.verify(
-            token,
-            publicKey,
-            {
-              algorithms: ["RS256"],
-              issuer: TOKEN_ISSUER,
-              audience: TOKEN_AUDIENCE,
-            },
-            (err, decoded) => {
-              if (err) reject(err);
-              resolve(decoded);
-            },
-          );
-        });
-      });
-    } catch (err) {
-      const verificationErrors = [
-        "TokenExpiredError",
-        "JsonWebTokenError",
-        "NotBeforeError",
-      ];
-      // Log the error if it wasn't one of the standard verification errors
-      if (!verificationErrors.includes(err.name)) {
-        logger.error(err);
-      }
-
-      throw new AuthenticationError("Invalid token.");
-    }
-
-    if (!decodedToken || !decodedToken.sub) {
-      throw new AuthenticationError("Invalid token.");
-    }
-
-    return decodedToken;
   }
 
   /**

@@ -4,7 +4,6 @@ const { initializeModels } = require("./models");
 
 const {
   DB_HOST: host = "localhost",
-  DB_PORT: port = "5432",
   DB_USERNAME: username = "postgres",
   DB_PASSWORD: password,
   DB_NAME: database = "chingu",
@@ -19,7 +18,6 @@ let sequelize;
 function initializeDatabase() {
   sequelize = new Sequelize({
     host,
-    port,
     username,
     password,
     database,

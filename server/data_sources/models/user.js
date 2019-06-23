@@ -4,14 +4,11 @@ const jwt = require("jsonwebtoken");
 const logger = require("../../utilities/logger");
 const { UserInputError } = require("apollo-server-express");
 const {
-  getPrivateKey,
-  getPublicKey,
+  SECRET_KEY,
   SALT_ROUNDS,
   TOKEN_AUDIENCE,
   TOKEN_ISSUER,
 } = require("../../utilities/auth");
-
-const { NODE_ENV = "development" } = process.env;
 
 /**
  * Signs a token
@@ -20,23 +17,21 @@ const { NODE_ENV = "development" } = process.env;
  * @return {Promise<string>} signed JWT
  */
 function signToken({ payload, options = {} }) {
-  return getPrivateKey().then(privateKey => {
-    return new Promise((resolve, reject) => {
-      jwt.sign(
-        payload,
-        privateKey,
-        {
-          algorithm: NODE_ENV === "production" ? "RS256" : "HS256",
-          ...options,
-        },
-        (err, token) => {
-          if (err) {
-            reject(err);
-          }
-          resolve(token);
-        },
-      );
-    });
+  return new Promise((resolve, reject) => {
+    jwt.sign(
+      payload,
+      SECRET_KEY,
+      {
+        algorithm: "HS256",
+        ...options,
+      },
+      (err, token) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(token);
+      },
+    );
   });
 }
 
@@ -100,23 +95,21 @@ class User extends Sequelize.Model {
 
     let decodedToken;
     try {
-      decodedToken = await getPublicKey().then(publicKey => {
-        return new Promise((resolve, reject) => {
-          jwt.verify(
-            token,
-            publicKey,
-            {
-              algorithms: NODE_ENV === "production" ? ["RS256"] : ["HS256"],
-              issuer: TOKEN_ISSUER,
-              audience: TOKEN_AUDIENCE,
-              ...options,
-            },
-            (err, decoded) => {
-              if (err) reject(err);
-              resolve(decoded);
-            },
-          );
-        });
+      decodedToken = await new Promise((resolve, reject) => {
+        jwt.verify(
+          token,
+          SECRET_KEY,
+          {
+            algorithms: ["HS256"],
+            issuer: TOKEN_ISSUER,
+            audience: TOKEN_AUDIENCE,
+            ...options,
+          },
+          (err, decoded) => {
+            if (err) reject(err);
+            resolve(decoded);
+          },
+        );
       });
     } catch (err) {
       const verificationErrors = [
@@ -271,16 +264,14 @@ class User extends Sequelize.Model {
   furnishAccessToken(sessionId) {
     const accessTokenPayload = {
       sub: this.id,
-      name: `${this.firstName} ${this.lastName}`,
+      name: this.name,
       jti: sessionId,
       role: this.role,
-      // Expires in an hour
-      exp: Math.floor(Date.now() / 1000) + 60 * 60 * 60,
       iss: TOKEN_ISSUER,
       aud: TOKEN_AUDIENCE,
     };
 
-    return signToken({ payload: accessTokenPayload });
+    return signToken({ payload: accessTokenPayload, options: { expiresIn: '1h' } });
   }
 
   /**
