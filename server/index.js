@@ -1,9 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const { ApolloServer, ApolloError } = require("apollo-server-express");
-const https = require("https");
 const http = require("http");
-const fs = require("fs");
 const morgan = require("./utilities/morgan");
 const logger = require("./utilities/logger");
 const { initializeDatabase, initializeDataSources } = require("./data_sources");
@@ -14,8 +12,6 @@ const schemaDirectives = require("./schema_directives");
 const {
   PORT = 3000,
   NODE_ENV = "development",
-  SSL_KEY_PATH,
-  SSL_CERT_PATH,
 } = process.env;
 
 /**
@@ -73,19 +69,7 @@ async function startServer() {
   });
   apollo.applyMiddleware({ app, path: "/graphql", cors: corsOptions });
 
-  let server;
-  if (NODE_ENV === "production") {
-    server = https.createServer(
-      {
-        key: fs.readFileSync(SSL_KEY_PATH),
-        cert: fs.readFileSync(SSL_CERT_PATH),
-      },
-      app,
-    );
-  } else {
-    server = http.createServer(app);
-  }
-
+  const server = http.createServer(app);
   server.listen({ port: PORT }, () => {
     logger.info(`Server ready on :${PORT}/graphql`);
   });
