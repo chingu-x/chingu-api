@@ -9,10 +9,7 @@ const typeDefs = require("./schema");
 const resolvers = require("./resolvers");
 const schemaDirectives = require("./schema_directives");
 
-const {
-  PORT = 3000,
-  NODE_ENV = "development",
-} = process.env;
+const { PORT = 3000, NODE_ENV = "development" } = process.env;
 
 /**
  * Entry point for the server
@@ -45,7 +42,13 @@ async function startServer() {
       logger,
     }),
     formatError: err => {
-      const userErrors = ["UNAUTHENTICATED", "UNAUTHORIZED", "BAD_USER_INPUT"];
+      const userErrors = [
+        "UNAUTHENTICATED",
+        "UNAUTHORIZED",
+        "FORBIDDEN",
+        "BAD_USER_INPUT",
+        "INTERNAL_SERVER_ERROR",
+      ];
       if (!userErrors.includes(err.code)) {
         logger.error(err);
 
