@@ -21,7 +21,11 @@ async function startServer() {
     methods: ["GET", "PUT", "POST"],
     credentials: false,
     preflightContinue: false,
-    origin: [],
+    maxAge: 86400,
+    origin: [
+      /^https?:\/\/admin\.chingu\.io\/?[\s]?$/,
+      /^https?:\/\/localhost(?:\:[0-9]{1,4})?\/?[\s]?$/
+    ],
   };
   app.use(cors(corsOptions));
   app.use(morgan());

@@ -103,6 +103,8 @@ const schema = gql`
     signUp(newUserInput: NewUserInput!): SignUpPayload!
     addPreRegisteredUser(preRegisteredUser: PreRegisteredUserInput!): PreRegisteredUser! @auth(requires: ADMIN)
     changeUserRole(id: ID!, role: Role!): User! @auth(requires: ADMIN)
+    emailUser(userId: ID!, subject: String!, text: String!): Boolean! @auth(requires: ADMIN)
+    emailPreRegisteredUser(userId: ID!, subject: String!, text: String!): Boolean! @auth(requires: ADMIN)
   }
 
   type Query {

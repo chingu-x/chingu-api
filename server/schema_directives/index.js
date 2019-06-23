@@ -1,15 +1,8 @@
-const jwt = require("jsonwebtoken");
 const { defaultFieldResolver } = require("graphql");
 const {
   SchemaDirectiveVisitor,
-  AuthenticationError,
   ForbiddenError,
 } = require("apollo-server-express");
-const {
-  TOKEN_AUDIENCE,
-  TOKEN_ISSUER,
-  SECRET_KEY,
-} = require("../utilities/auth");
 
 /**
  * Defines the "@auth" schema directive

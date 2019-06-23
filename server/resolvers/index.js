@@ -1,5 +1,6 @@
 const { ApolloError, UserInputError } = require("apollo-server-express");
 const { GraphQLScalarType, Kind } = require("graphql");
+const { sendEmail } = require("../utilities/email");
 const logger = require("../utilities/logger");
 
 module.exports = {
@@ -109,6 +110,46 @@ module.exports = {
           );
         });
     },
+    emailUser: async (_, args, context) => {
+      const { User } = context.dataSources.models;
+      const { userId, subject, text } = args;
+
+      const user = await User.findByPk(userId);
+      if (!user) {
+        throw new UserInputError("Invalid user ID");
+      }
+
+      await sendEmail({
+        to: {
+          name: user.name,
+          email: user.email
+        },
+        subject,
+        text
+      });
+
+      return true;
+    },
+    emailPreRegisteredUser: async (_, args, context) => {
+      const { PreRegisteredUser } = context.dataSources.models;
+      const { userId, subject, text } = args;
+
+      const user = await PreRegisteredUser.findByPk(userId);
+      if (!user) {
+        throw new UserInputError("Invalid user ID");
+      }
+
+      await sendEmail({
+        to: {
+          name: user.name,
+          email: user.email
+        },
+        subject,
+        text
+      });
+
+      return true;
+    }
   },
   Query: {
     me: async (_, __, context) => {
